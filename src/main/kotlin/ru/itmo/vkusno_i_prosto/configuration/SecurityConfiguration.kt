@@ -20,7 +20,7 @@ class SecurityConfiguration(
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http.csrf(Customizer.withDefaults())
+        http.csrf { it.disable() }
         .cors { it.disable() }
         .authorizeHttpRequests {
             it.requestMatchers("/v1/users").permitAll()

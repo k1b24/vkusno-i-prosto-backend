@@ -9,9 +9,14 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/vkusno_i_prosto
+      database: vkusno_i_prosto
+      uuid-representation: java_legacy
 
-logging:
-  level:
-    org:
-      springframework:
-        security: DEBUG
+#logging:
+#  level:
+#    org:
+#      springframework:
+#        security: DEBUG

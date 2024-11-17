@@ -2,7 +2,8 @@ package ru.itmo.vkusno_i_prosto.model.request
 
 import ru.itmo.vkusno_i_prosto.model.recipes.Recipe
 
-data class PostRecipeRequest(
+data class PutRecipeRequest(
+    val id: String,
     val name: String,
     val image: String,
     val ingredients: List<String>,
@@ -12,6 +13,7 @@ data class PostRecipeRequest(
     val showUsername: Boolean,
 ) {
     fun toRecipe(username: String): Recipe = Recipe(
+        id = id,
         name = name,
         image = image,
         ingredients = ingredients,
@@ -19,6 +21,6 @@ data class PostRecipeRequest(
         tags = tags,
         showUsername = showUsername,
         videoLink = videoLink,
-        ownerUsername = username,
+        ownerUsername= username,
     )
 }

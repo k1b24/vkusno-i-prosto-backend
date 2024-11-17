@@ -1,45 +1,102 @@
 package ru.itmo.vkusno_i_prosto.controllers
 
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import ru.itmo.vkusno_i_prosto.exception.ResponseStatusException
+import ru.itmo.vkusno_i_prosto.model.recipes.Recipe
 import ru.itmo.vkusno_i_prosto.model.request.PostRecipeRequest
+import ru.itmo.vkusno_i_prosto.model.request.PutRecipeRequest
+import ru.itmo.vkusno_i_prosto.model.response.PageableRecipeResponse
+import ru.itmo.vkusno_i_prosto.model.response.RecipeResponse
+import ru.itmo.vkusno_i_prosto.repository.RecipesRepository
+import kotlin.jvm.optionals.getOrNull
 
 @RestController
 @RequestMapping("/v1/recipes")
-class RecipesController {
+class RecipesController(
+    private val recipesRepository: RecipesRepository,
+) {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createRecipe(
         @RequestBody postRecipeRequest: PostRecipeRequest,
+        authentication: Authentication,
     ) {
-        throw NotImplementedError()
+        recipesRepository.save(postRecipeRequest.toRecipe(authentication.name))
     }
 
     @PutMapping("/{recipe-id}")
-    fun updateRecipe() {
-        throw NotImplementedError()
+    fun updateRecipe(
+        @RequestBody putRecipeRequest: PutRecipeRequest,
+        authentication: Authentication,
+    ) {
+        recipesRepository.save(putRecipeRequest.toRecipe(authentication.name))
     }
 
     @GetMapping("/{recipe-id}")
-    fun getRecipeById() {
-        throw NotImplementedError()
+    fun getRecipeById(
+        @PathVariable(name = "recipe-id") recipeId: String,
+        authentication: Authentication,
+    ): RecipeResponse {
+        val recipe = recipesRepository.findById(recipeId)
+        if (recipe.isEmpty) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND.value(), "Recipe not found")
+        }
+        return recipe.get().toRecipeResponse(authentication.name)
     }
 
     @GetMapping
-    fun getRecipes(): String {
-        throw NotImplementedError()
+    fun getRecipes(
+        @RequestParam("offset") offset: Long?,
+        @RequestParam("limit") limit: Long?,
+        authentication: Authentication,
+    ): PageableRecipeResponse {
+        val trueOffset = offset ?: 0
+        val trueLimit = limit ?: Long.MAX_VALUE
+        val total = recipesRepository.count()
+        return PageableRecipeResponse(
+            recipes = recipesRepository.findAll(trueOffset, trueLimit).map { it.toRecipeResponse(authentication.name) },
+            offset = trueOffset,
+            limit = trueLimit,
+            total = total,
+        )
     }
 
     @DeleteMapping("/{recipe-id}")
-    fun deleteRecipeById() {
-        throw NotImplementedError()
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteRecipeById(
+        @PathVariable(name = "recipe-id") recipeId: String,
+        authentication: Authentication,
+    ) {
+        val recipe = recipesRepository.findById(recipeId)
+        if (recipe.isEmpty) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND.value(), "Recipe not found")
+        }
+        if (recipe.get().ownerUsername != authentication.name) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN.value(), "You are not the owner of this recipe")
+        }
+        recipesRepository.deleteById(recipeId)
     }
 }
+
+fun Recipe.toRecipeResponse(username: String) = RecipeResponse(
+    id = id!!,
+    name = name,
+    image = image,
+    ingredients = ingredients,
+    steps = steps,
+    tags = tags,
+    ownerUsername = if (showUsername || username == ownerUsername) ownerUsername else null,
+    videoLink = videoLink,
+)

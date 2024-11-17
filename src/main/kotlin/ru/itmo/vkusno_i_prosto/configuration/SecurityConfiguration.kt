@@ -27,6 +27,7 @@ class SecurityConfiguration(
         .authorizeHttpRequests {
             it.requestMatchers("/v1/users").permitAll()
             it.requestMatchers("/v1/token").permitAll()
+            it.requestMatchers("/error").permitAll()
             it.anyRequest().authenticated()
         }
         .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }

@@ -36,10 +36,11 @@ interface RecipesRepository : MongoRepository<Recipe, String> {
     fun findAllByUsername(ownerUsername: String, offset: Long, limit: Long): List<Recipe>
 
     @Aggregation(pipeline = [
+        "{ \$match : { 'favorites' : { \$in : ?0}} }",
         "{'\$skip' : ?1}",
         "{'\$limit' : ?2}"
     ])
-    fun findByFavoritesContains(login: String, offset: Long, limit: Long): List<Recipe>
+    fun findByFavoritesContains(login: List<String>, offset: Long, limit: Long): List<Recipe>
 
     fun countByFavoritesContains(login: String): Long
 }

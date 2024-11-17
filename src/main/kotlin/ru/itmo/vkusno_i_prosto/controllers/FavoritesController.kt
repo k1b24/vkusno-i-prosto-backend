@@ -37,11 +37,26 @@ class FavoritesController(
         val trueOffset = offset ?: 0
         val trueLimit = limit ?: Long.MAX_VALUE
         return PageableRecipeResponse(
-            recipes = recipesRepository.findByFavoritesContains(authentication.name, trueOffset, trueLimit).map { it.toRecipeResponse(authentication.name) },
+            recipes = recipesRepository.findByFavoritesContains(listOf(authentication.name), trueOffset, trueLimit).map { it.toRecipeResponse(authentication.name) },
             offset = trueOffset,
             limit = trueLimit,
             total = recipesRepository.countByFavoritesContains(authentication.name),
         )
+    }
+
+    @DeleteMapping("/{recipe-id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun removeFavorite(
+        @PathVariable("recipe-id") recipeId: String,
+        authentication: Authentication,
+    ) {
+        val recipe = recipesRepository.findById(recipeId)
+        if (recipe.isEmpty) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND.value(), "Recipe not found")
+        }
+        val recipeEntity = recipe.get()
+        recipeEntity.favorites.remove(authentication.name)
+        recipesRepository.save(recipeEntity)
     }
 
     @GetMapping("/{recipe-id}")

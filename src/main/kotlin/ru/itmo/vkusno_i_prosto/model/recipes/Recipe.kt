@@ -15,5 +15,5 @@ data class Recipe(
     val showUsername: Boolean,
     val ownerUsername: String,
     val videoLink: String?,
-    var favoriteBy: List<String> = emptyList(),
+    var favorites: MutableList<String> = mutableListOf(),
 )

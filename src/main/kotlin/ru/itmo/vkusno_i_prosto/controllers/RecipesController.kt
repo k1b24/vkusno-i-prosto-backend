@@ -60,13 +60,44 @@ class RecipesController(
     fun getRecipes(
         @RequestParam("offset") offset: Long?,
         @RequestParam("limit") limit: Long?,
+        @RequestParam("ingredients") ingredients: List<String>?,
+        authentication: Authentication?,
+    ): PageableRecipeResponse {
+        val trueOffset = offset ?: 0
+        val trueLimit = limit ?: Long.MAX_VALUE
+        val total = recipesRepository.count()
+        println(ingredients)
+        val recipes = if (ingredients.isNullOrEmpty()) {
+            recipesRepository.findAll(trueOffset, trueLimit)
+        } else {
+            recipesRepository.findAll(ingredients, trueOffset, trueLimit)
+        }
+        return PageableRecipeResponse(
+            recipes = recipes.map { it.toRecipeResponse(authentication?.name) },
+            offset = trueOffset,
+            limit = trueLimit,
+            total = total,
+        )
+    }
+
+    @GetMapping("/user")
+    fun getRecipesByUser(
+        @RequestParam("offset") offset: Long?,
+        @RequestParam("limit") limit: Long?,
+        @RequestParam("ingredients") ingredients: List<String>?,
         authentication: Authentication,
     ): PageableRecipeResponse {
         val trueOffset = offset ?: 0
         val trueLimit = limit ?: Long.MAX_VALUE
         val total = recipesRepository.count()
+        println(ingredients)
+        val recipes = if (ingredients.isNullOrEmpty()) {
+            recipesRepository.findAllByUsername(authentication.name, trueOffset, trueLimit)
+        } else {
+            recipesRepository.findAllByUsername(ingredients, authentication.name, trueOffset, trueLimit)
+        }
         return PageableRecipeResponse(
-            recipes = recipesRepository.findAll(trueOffset, trueLimit).map { it.toRecipeResponse(authentication.name) },
+            recipes = recipes.map { it.toRecipeResponse(authentication.name) },
             offset = trueOffset,
             limit = trueLimit,
             total = total,
@@ -90,7 +121,7 @@ class RecipesController(
     }
 }
 
-fun Recipe.toRecipeResponse(username: String) = RecipeResponse(
+fun Recipe.toRecipeResponse(username: String?) = RecipeResponse(
     id = id!!,
     name = name,
     image = image,

@@ -63,16 +63,17 @@ class RecipesController(
         @RequestParam("offset") offset: Long?,
         @RequestParam("limit") limit: Long?,
         @RequestParam("ingredients") ingredients: List<String>?,
+        @RequestParam("excludeIngredients") excludeIngredients: List<String>?,
         authentication: Authentication?,
     ): PageableRecipeResponse {
         val trueOffset = offset ?: 0
         val trueLimit = limit ?: Long.MAX_VALUE
         val total = recipesRepository.count()
-        println(ingredients)
+        val trueExclude = excludeIngredients ?: emptyList()
         val recipes = if (ingredients.isNullOrEmpty()) {
-            recipesRepository.findAll(trueOffset, trueLimit)
+            recipesRepository.findAll(trueExclude, trueOffset, trueLimit)
         } else {
-            recipesRepository.findAll(ingredients, trueOffset, trueLimit)
+            recipesRepository.findAll(ingredients, trueExclude, trueOffset, trueLimit)
         }
         return PageableRecipeResponse(
             recipes = recipes.map { it.toRecipeResponse(authentication?.name) },
@@ -87,16 +88,17 @@ class RecipesController(
         @RequestParam("offset") offset: Long?,
         @RequestParam("limit") limit: Long?,
         @RequestParam("ingredients") ingredients: List<String>?,
+        @RequestParam("excludeIngredients") excludeIngredients: List<String>?,
         authentication: Authentication,
     ): PageableRecipeResponse {
         val trueOffset = offset ?: 0
         val trueLimit = limit ?: Long.MAX_VALUE
         val total = recipesRepository.count()
-        println(ingredients)
+        val trueExclude = excludeIngredients ?: emptyList()
         val recipes = if (ingredients.isNullOrEmpty()) {
-            recipesRepository.findAllByUsername(authentication.name, trueOffset, trueLimit)
+            recipesRepository.findAllByUsername(authentication.name, trueExclude, trueOffset, trueLimit)
         } else {
-            recipesRepository.findAllByUsername(ingredients, authentication.name, trueOffset, trueLimit)
+            recipesRepository.findAllByUsername(ingredients, trueExclude, authentication.name, trueOffset, trueLimit)
         }
         return PageableRecipeResponse(
             recipes = recipes.map { it.toRecipeResponse(authentication.name) },
@@ -136,5 +138,6 @@ fun Recipe.toRecipeResponse(username: String?) = RecipeResponse(
     steps = steps,
     tags = tags,
     ownerUsername = if (showUsername || username == ownerUsername) ownerUsername else null,
+    showUsername = showUsername,
     videoLink = videoLink,
 )

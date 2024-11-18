@@ -9,31 +9,32 @@ import ru.itmo.vkusno_i_prosto.model.recipes.Recipe
 @Repository
 interface RecipesRepository : MongoRepository<Recipe, String> {
     @Aggregation(pipeline = [
-        "{ \$match : { 'ingredients' : { \$in : ?0}} }",
-        "{'\$skip' : ?1}",
-        "{'\$limit' : ?2}"
-    ])
-    fun findAll(ingredients: List<String>, offset: Long, limit: Long): List<Recipe>
-
-    @Aggregation(pipeline = [
-        "{'\$skip' : ?0}",
-        "{'\$limit' : ?1}"
-    ])
-    fun findAll(offset: Long, limit: Long): List<Recipe>
-
-    @Aggregation(pipeline = [
-        "{ \$match : { 'ingredients' : { \$in : ?0 }, 'ownerUsername' : ?1} }",
+        "{ \$match : { 'ingredients' : { \$in : ?0}, 'ingredients' : { \$nin : ?1} } }",
         "{'\$skip' : ?2}",
         "{'\$limit' : ?3}"
     ])
-    fun findAllByUsername(ingredients: List<String>, ownerUsername: String, offset: Long, limit: Long): List<Recipe>
+    fun findAll(ingredients: List<String>, excludeIngredients: List<String>, offset: Long, limit: Long): List<Recipe>
 
     @Aggregation(pipeline = [
-        "{ \$match : { 'ownerUsername' : ?0} }",
+        "{ \$match : { 'ingredients' : { \$nin : ?0} } }",
         "{'\$skip' : ?1}",
         "{'\$limit' : ?2}"
     ])
-    fun findAllByUsername(ownerUsername: String, offset: Long, limit: Long): List<Recipe>
+    fun findAll(excludeIngredients: List<String>, offset: Long, limit: Long): List<Recipe>
+
+    @Aggregation(pipeline = [
+        "{ \$match : { 'ingredients' : { \$in : ?0 }, 'ingredients' : { \$nin : ?1}, 'ownerUsername' : ?2} }",
+        "{'\$skip' : ?3}",
+        "{'\$limit' : ?4}"
+    ])
+    fun findAllByUsername(ingredients: List<String>, excludeIngredients: List<String>, ownerUsername: String, offset: Long, limit: Long): List<Recipe>
+
+    @Aggregation(pipeline = [
+        "{ \$match : { 'ownerUsername' : ?0, 'ingredients' : { \$nin : ?1}} }",
+        "{'\$skip' : ?2}",
+        "{'\$limit' : ?3}"
+    ])
+    fun findAllByUsername(ownerUsername: String, excludeIngredients: List<String>, offset: Long, limit: Long): List<Recipe>
 
     @Aggregation(pipeline = [
         "{ \$match : { 'favorites' : { \$in : ?0}} }",

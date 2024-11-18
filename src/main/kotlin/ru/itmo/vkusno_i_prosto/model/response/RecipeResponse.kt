@@ -10,5 +10,6 @@ data class RecipeResponse(
     val steps: List<String>,
     val tags: List<String>,
     val ownerUsername: String?,
+    val showUsername: Boolean,
     val videoLink: String?,
 )

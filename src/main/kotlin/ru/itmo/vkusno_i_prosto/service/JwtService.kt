@@ -14,15 +14,14 @@ class JwtService {
     val tokenTtl: Long = 1000 * 60 * 60 * 100 // 100 hours
     val secret: String = "superpupersecretkeydonttellanyone"
 
-    fun generateToken(login: String): String {
-        val claims: Map<String, Any> = HashMap()
+    fun generateToken(login: String, username: String): String {
+        val claims: Map<String, Any> = mutableMapOf("username" to username)
         return Jwts.builder()
             .setClaims(claims)
             .setSubject(login)
             .setIssuedAt(Date(System.currentTimeMillis()))
             .setExpiration(Date(System.currentTimeMillis() + tokenTtl)) // 100 hours
             .signWith(getSigningKey())
-//            .signWith(SignatureAlgorithm.HS256, secret)
             .compact()
     }
 

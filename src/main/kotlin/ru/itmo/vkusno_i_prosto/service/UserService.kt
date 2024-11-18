@@ -42,7 +42,7 @@ class UserService(
         val user = userRepository.findByLogin(request.login)
         if (user != null && passwordEncoder.matches(request.password, user.password)) {
             return TokenResponse(
-                jwtService.generateToken(user.login),
+                jwtService.generateToken(user.login, user.username),
                 jwtService.tokenTtl,
             )
         } else {

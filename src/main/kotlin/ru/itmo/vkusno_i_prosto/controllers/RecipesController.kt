@@ -1,8 +1,10 @@
 package ru.itmo.vkusno_i_prosto.controllers
 
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -118,6 +120,11 @@ class RecipesController(
             throw ResponseStatusException(HttpStatus.FORBIDDEN.value(), "You are not the owner of this recipe")
         }
         recipesRepository.deleteById(recipeId)
+    }
+
+    @ExceptionHandler(ResponseStatusException::class)
+    fun handleResponseStatusException(e: ResponseStatusException): ResponseEntity<ResponseStatusException> {
+        return ResponseEntity.status(e.code).body(e)
     }
 }
 

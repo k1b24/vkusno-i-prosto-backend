@@ -38,8 +38,8 @@ interface RecipesRepository : MongoRepository<Recipe, String> {
 
     @Aggregation(pipeline = [
         "{ \$match : { 'favorites' : { \$in : ?0}} }",
-        "{'\$skip' : ?2}",
-        "{'\$limit' : ?3}"
+        "{'\$skip' : ?1}",
+        "{'\$limit' : ?2}"
     ])
     fun findByFavoritesContains(login: List<String>, offset: Long, limit: Long): List<Recipe>
 

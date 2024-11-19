@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*
 import ru.itmo.vkusno_i_prosto.exception.ResponseStatusException
 import ru.itmo.vkusno_i_prosto.model.request.AuthenticateRequest
 import ru.itmo.vkusno_i_prosto.model.request.UserRequest
+import ru.itmo.vkusno_i_prosto.model.response.ErrorResponse
 import ru.itmo.vkusno_i_prosto.model.response.TokenResponse
 import ru.itmo.vkusno_i_prosto.service.UserService
 
@@ -24,7 +25,8 @@ class UserController(
     fun authenticateUser(@RequestBody userRequest: AuthenticateRequest): TokenResponse = userService.authenticateUser(userRequest)
 
     @ExceptionHandler(ResponseStatusException::class)
-    fun handleResponseStatusException(ex: ResponseStatusException): ResponseEntity<String> {
-        return ResponseEntity(ex.message, HttpStatus.valueOf(ex.code))
+    fun handleResponseStatusException(e: ResponseStatusException): ResponseEntity<ErrorResponse> {
+        println("here")
+        return ResponseEntity.status(e.code).body(ErrorResponse(e.message, e.forbiddenType?.name))
     }
 }

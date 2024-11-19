@@ -1,5 +1,6 @@
 package ru.itmo.vkusno_i_prosto.configuration
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -8,6 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
+import ru.itmo.vkusno_i_prosto.exception.AuthenticationException
+import ru.itmo.vkusno_i_prosto.exception.ForbiddenType
 import ru.itmo.vkusno_i_prosto.service.JwtService
 import ru.itmo.vkusno_i_prosto.service.UserService
 
@@ -40,6 +43,10 @@ class JwtRequestFilter(
                 authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
                 println(authToken.isAuthenticated)
                 SecurityContextHolder.getContext().authentication = authToken
+            } else {
+                response.status = HttpServletResponse.SC_UNAUTHORIZED
+                response.outputStream.write(jacksonObjectMapper().writeValueAsBytes(AuthenticationException("Token expired", ForbiddenType.TOKEN_EXPIRED)))
+                return
             }
         }
         chain.doFilter(request, response)

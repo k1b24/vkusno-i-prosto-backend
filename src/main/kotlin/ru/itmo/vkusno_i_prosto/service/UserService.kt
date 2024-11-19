@@ -5,7 +5,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import ru.itmo.vkusno_i_prosto.exception.AuthenticationException
 import ru.itmo.vkusno_i_prosto.exception.DatabaseException
-import ru.itmo.vkusno_i_prosto.exception.UserAlreadyExistsException
+import ru.itmo.vkusno_i_prosto.exception.ForbiddenType
 import ru.itmo.vkusno_i_prosto.model.request.AuthenticateRequest
 import ru.itmo.vkusno_i_prosto.model.request.UserRequest
 import ru.itmo.vkusno_i_prosto.model.response.TokenResponse
@@ -23,10 +23,10 @@ class UserService(
     fun registerUser(request: UserRequest) {
         try {
             if (userRepository.existsByLogin(request.login)) {
-                throw UserAlreadyExistsException("User with login '${request.login}' already exists.")
+                throw AuthenticationException("User with login '${request.login}' already exists.", ForbiddenType.USER_EXISTS)
             }
             if (userRepository.existsByUsername(request.username)) {
-                throw UserAlreadyExistsException("User with username '${request.username}' already exists.")
+                throw AuthenticationException("User with username '${request.username}' already exists.", ForbiddenType.USER_EXISTS)
             }
 
             val vipUser = VipUser(
@@ -49,7 +49,7 @@ class UserService(
                 jwtService.tokenTtl,
             )
         } else {
-            throw AuthenticationException("User with login '${request.login}' not found.")
+            throw AuthenticationException("User with login '${request.login}' not found.", ForbiddenType.BAD_AUTH)
         }
     }
 

@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import ru.itmo.vkusno_i_prosto.exception.ForbiddenType
 import ru.itmo.vkusno_i_prosto.exception.ResponseStatusException
 import ru.itmo.vkusno_i_prosto.model.recipes.Recipe
 import ru.itmo.vkusno_i_prosto.model.request.PostRecipeRequest
 import ru.itmo.vkusno_i_prosto.model.request.PutRecipeRequest
+import ru.itmo.vkusno_i_prosto.model.response.ErrorResponse
 import ru.itmo.vkusno_i_prosto.model.response.PageableRecipeResponse
 import ru.itmo.vkusno_i_prosto.model.response.RecipeResponse
 import ru.itmo.vkusno_i_prosto.repository.RecipesRepository
@@ -123,14 +125,15 @@ class RecipesController(
             throw ResponseStatusException(HttpStatus.NOT_FOUND.value(), "Recipe not found")
         }
         if (recipe.get().ownerUsername != authentication.name) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN.value(), "You are not the owner of this recipe")
+            throw ResponseStatusException(HttpStatus.FORBIDDEN.value(), "You are not the owner of this recipe", ForbiddenType.NO_PERMISSION)
         }
         recipesRepository.deleteById(recipeId)
     }
 
     @ExceptionHandler(ResponseStatusException::class)
-    fun handleResponseStatusException(e: ResponseStatusException): ResponseEntity<ResponseStatusException> {
-        return ResponseEntity.status(e.code).body(e)
+    fun handleResponseStatusException(e: ResponseStatusException): ResponseEntity<ErrorResponse> {
+        println("here")
+        return ResponseEntity.status(e.code).body(ErrorResponse(e.message, e.forbiddenType?.name))
     }
 }
 

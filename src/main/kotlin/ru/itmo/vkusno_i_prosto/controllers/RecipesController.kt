@@ -64,12 +64,14 @@ class RecipesController(
         @RequestParam("limit") limit: Long?,
         @RequestParam("ingredients") ingredients: List<String>?,
         @RequestParam("excludeIngredients") excludeIngredients: List<String>?,
+        @RequestParam("name") name: String?,
         authentication: Authentication?,
     ): PageableRecipeResponse {
         val trueOffset = offset ?: 0
         val trueLimit = limit ?: Long.MAX_VALUE
         val total = recipesRepository.count()
         val trueExclude = excludeIngredients ?: emptyList()
+        val trueName = name ?: "*"
         val recipes = if (ingredients.isNullOrEmpty()) {
             recipesRepository.findAll(trueExclude, trueOffset, trueLimit)
         } else {
@@ -89,6 +91,7 @@ class RecipesController(
         @RequestParam("limit") limit: Long?,
         @RequestParam("ingredients") ingredients: List<String>?,
         @RequestParam("excludeIngredients") excludeIngredients: List<String>?,
+        @RequestParam("name") name: String?,
         authentication: Authentication,
     ): PageableRecipeResponse {
         val trueOffset = offset ?: 0

@@ -25,6 +25,9 @@ class UserService(
             if (userRepository.existsByLogin(request.login)) {
                 throw UserAlreadyExistsException("User with login '${request.login}' already exists.")
             }
+            if (userRepository.existsByUsername(request.username)) {
+                throw UserAlreadyExistsException("User with username '${request.username}' already exists.")
+            }
 
             val vipUser = VipUser(
                 login = request.login,

@@ -16,32 +16,32 @@ interface RecipesRepository : MongoRepository<Recipe, String> {
     fun findAll(ingredients: List<String>, excludeIngredients: List<String>, offset: Long, limit: Long): List<Recipe>
 
     @Aggregation(pipeline = [
-        "{ \$match : { 'ingredients' : { \$nin : ?0} } }",
-        "{'\$skip' : ?1}",
-        "{'\$limit' : ?2}"
-    ])
-    fun findAll(excludeIngredients: List<String>, offset: Long, limit: Long): List<Recipe>
-
-    @Aggregation(pipeline = [
-        "{ \$match : { 'ingredients' : { \$in : ?0 }, 'ingredients' : { \$nin : ?1}, 'ownerUsername' : ?2} }",
-        "{'\$skip' : ?3}",
-        "{'\$limit' : ?4}"
-    ])
-    fun findAllByUsername(ingredients: List<String>, excludeIngredients: List<String>, ownerUsername: String, offset: Long, limit: Long): List<Recipe>
-
-    @Aggregation(pipeline = [
-        "{ \$match : { 'ownerUsername' : ?0, 'ingredients' : { \$nin : ?1}} }",
+        "{ \$match : { 'ingredients' : { \$nin : ?0}, 'name' : { \$regex : ?1 } } }",
         "{'\$skip' : ?2}",
         "{'\$limit' : ?3}"
     ])
-    fun findAllByUsername(ownerUsername: String, excludeIngredients: List<String>, offset: Long, limit: Long): List<Recipe>
+    fun findAll(excludeIngredients: List<String>, name: String, offset: Long, limit: Long): List<Recipe>
 
     @Aggregation(pipeline = [
-        "{ \$match : { 'favorites' : { \$in : ?0}} }",
-        "{'\$skip' : ?1}",
-        "{'\$limit' : ?2}"
+        "{ \$match : { 'ingredients' : { \$in : ?0 }, 'ingredients' : { \$nin : ?1}, 'ownerUsername' : ?2, 'name' : { \$regex : ?3 }} }",
+        "{'\$skip' : ?4}",
+        "{'\$limit' : ?5}"
     ])
-    fun findByFavoritesContains(login: List<String>, offset: Long, limit: Long): List<Recipe>
+    fun findAllByUsername(ingredients: List<String>, excludeIngredients: List<String>, ownerUsername: String, name: String, offset: Long, limit: Long): List<Recipe>
+
+    @Aggregation(pipeline = [
+        "{ \$match : { 'ownerUsername' : ?0, 'ingredients' : { \$nin : ?1}, 'name' : { \$regex : ?2 }} }",
+        "{'\$skip' : ?3}",
+        "{'\$limit' : ?4}"
+    ])
+    fun findAllByUsername(ownerUsername: String, excludeIngredients: List<String>, name: String, offset: Long, limit: Long): List<Recipe>
+
+    @Aggregation(pipeline = [
+        "{ \$match : { 'favorites' : { \$in : ?0}, 'name' : { \$regex : ?1 }} }",
+        "{'\$skip' : ?2}",
+        "{'\$limit' : ?3}"
+    ])
+    fun findByFavoritesContains(login: List<String>, name: String, offset: Long, limit: Long): List<Recipe>
 
     fun countByFavoritesContains(login: String): Long
 }

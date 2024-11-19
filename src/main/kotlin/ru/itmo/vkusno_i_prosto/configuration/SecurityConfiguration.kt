@@ -28,7 +28,7 @@ class SecurityConfiguration(
             it.requestMatchers("/v1/users").permitAll()
             it.requestMatchers("/v1/token").permitAll()
             it.requestMatchers("/error").permitAll()
-            it.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/v1/recipes/")).permitAll()
+            it.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/v1/recipes")).permitAll()
             it.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/v1/recipes/*")).permitAll()
             it.anyRequest().authenticated()
         }

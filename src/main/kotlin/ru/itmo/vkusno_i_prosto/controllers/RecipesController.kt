@@ -71,11 +71,11 @@ class RecipesController(
         val trueLimit = limit ?: Long.MAX_VALUE
         val total = recipesRepository.count()
         val trueExclude = excludeIngredients ?: emptyList()
-        val trueName = name ?: "*"
+        val trueName = name ?: ".*"
         val recipes = if (ingredients.isNullOrEmpty()) {
-            recipesRepository.findAll(trueExclude, trueOffset, trueLimit)
+            recipesRepository.findAll(trueExclude, trueName, trueOffset, trueLimit)
         } else {
-            recipesRepository.findAll(ingredients, trueExclude, trueOffset, trueLimit)
+            recipesRepository.findAll(ingredients, trueExclude, trueName, trueOffset, trueLimit)
         }
         return PageableRecipeResponse(
             recipes = recipes.map { it.toRecipeResponse(authentication?.name) },
@@ -98,10 +98,11 @@ class RecipesController(
         val trueLimit = limit ?: Long.MAX_VALUE
         val total = recipesRepository.count()
         val trueExclude = excludeIngredients ?: emptyList()
+        val trueName = name ?: ".*"
         val recipes = if (ingredients.isNullOrEmpty()) {
-            recipesRepository.findAllByUsername(authentication.name, trueExclude, trueOffset, trueLimit)
+            recipesRepository.findAllByUsername(authentication.name, trueExclude, trueName, trueOffset, trueLimit)
         } else {
-            recipesRepository.findAllByUsername(ingredients, trueExclude, authentication.name, trueOffset, trueLimit)
+            recipesRepository.findAllByUsername(ingredients, trueExclude, authentication.name, trueName, trueOffset, trueLimit)
         }
         return PageableRecipeResponse(
             recipes = recipes.map { it.toRecipeResponse(authentication.name) },

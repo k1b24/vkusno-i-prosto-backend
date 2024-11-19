@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import ru.itmo.vkusno_i_prosto.exception.AuthenticationException
 import ru.itmo.vkusno_i_prosto.exception.ForbiddenType
+import ru.itmo.vkusno_i_prosto.model.response.ErrorResponse
 import ru.itmo.vkusno_i_prosto.service.JwtService
 import ru.itmo.vkusno_i_prosto.service.UserService
 
@@ -45,7 +46,7 @@ class JwtRequestFilter(
                 SecurityContextHolder.getContext().authentication = authToken
             } else {
                 response.status = HttpServletResponse.SC_UNAUTHORIZED
-                response.outputStream.write(jacksonObjectMapper().writeValueAsBytes(AuthenticationException("Token expired", ForbiddenType.TOKEN_EXPIRED)))
+                response.outputStream.write(jacksonObjectMapper().writeValueAsBytes(ErrorResponse("Token expired", ForbiddenType.TOKEN_EXPIRED.name)))
                 return
             }
         }

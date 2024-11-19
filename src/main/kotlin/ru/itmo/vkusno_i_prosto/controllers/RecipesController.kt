@@ -49,13 +49,13 @@ class RecipesController(
     @GetMapping("/{recipe-id}")
     fun getRecipeById(
         @PathVariable(name = "recipe-id") recipeId: String,
-        authentication: Authentication,
+        authentication: Authentication?,
     ): RecipeResponse {
         val recipe = recipesRepository.findById(recipeId)
         if (recipe.isEmpty) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND.value(), "Recipe not found")
         }
-        return recipe.get().toRecipeResponse(authentication.name)
+        return recipe.get().toRecipeResponse(authentication?.name)
     }
 
     @GetMapping

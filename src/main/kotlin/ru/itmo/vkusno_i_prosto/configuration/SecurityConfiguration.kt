@@ -43,9 +43,9 @@ class SecurityConfiguration(
         val configuration = CorsConfiguration()
         configuration.allowCredentials = true
         configuration.allowedHeaders = listOf("*")
-        configuration.allowedMethods = listOf("http://localhost:8080", "http://localhost:5173", "http://147.45.165.69:5173")
+        configuration.allowedOriginPatterns = listOf("http://localhost:8080", "http://localhost:5173", "http://147.45.165.69:5173")
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH", "HEAD")
-        configuration.allowedOrigins = listOf("http://localhost:8080", "http://localhost:5173", "http://147.45.165.69:5173")
+//        configuration.allowedOrigins = listOf("http://localhost:8080", "http://localhost:5173", "http://147.45.165.69:5173")
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration)
         return source

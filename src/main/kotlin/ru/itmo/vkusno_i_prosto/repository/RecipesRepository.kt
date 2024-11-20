@@ -8,28 +8,28 @@ import ru.itmo.vkusno_i_prosto.model.recipes.Recipe
 @Repository
 interface RecipesRepository : MongoRepository<Recipe, String> {
     @Aggregation(pipeline = [
-        "{ \$match : { 'ingredients' : { \$in : ?0}, 'ingredients' : { \$nin : ?1}, 'name' : { \$regex : ?2 } } }",
+        "{ \$match : { 'ingredients' : { \$in : ?0}, 'ingredients' : { \$nin : ?1}, 'name' : { \$regex : ?2, \$options : 'i' } } }",
         "{'\$skip' : ?3}",
         "{'\$limit' : ?4}"
     ])
     fun findAll(ingredients: List<String>, excludeIngredients: List<String>, name: String, offset: Long, limit: Long): List<Recipe>
 
     @Aggregation(pipeline = [
-        "{ \$match : { 'ingredients' : { \$nin : ?0}, 'name' : { \$regex : ?1 } } }",
+        "{ \$match : { 'ingredients' : { \$nin : ?0}, 'name' : { \$regex : ?1, \$options : 'i' } } }",
         "{'\$skip' : ?2}",
         "{'\$limit' : ?3}"
     ])
     fun findAll(excludeIngredients: List<String>, name: String, offset: Long, limit: Long): List<Recipe>
 
     @Aggregation(pipeline = [
-        "{ \$match : { 'ingredients' : { \$in : ?0 }, 'ingredients' : { \$nin : ?1}, 'ownerUsername' : ?2, 'name' : { \$regex : ?3 }} }",
+        "{ \$match : { 'ingredients' : { \$in : ?0 }, 'ingredients' : { \$nin : ?1}, 'ownerUsername' : ?2, 'name' : { \$regex : ?3, \$options : 'i'}} }",
         "{'\$skip' : ?4}",
         "{'\$limit' : ?5}"
     ])
     fun findAllByUsername(ingredients: List<String>, excludeIngredients: List<String>, ownerUsername: String, name: String, offset: Long, limit: Long): List<Recipe>
 
     @Aggregation(pipeline = [
-        "{ \$match : { 'ownerUsername' : ?0, 'ingredients' : { \$nin : ?1}, 'name' : { \$regex : ?2 }} }",
+        "{ \$match : { 'ownerUsername' : ?0, 'ingredients' : { \$nin : ?1}, 'name' : { \$regex : ?2, \$options : 'i' }} }",
         "{'\$skip' : ?3}",
         "{'\$limit' : ?4}"
     ])

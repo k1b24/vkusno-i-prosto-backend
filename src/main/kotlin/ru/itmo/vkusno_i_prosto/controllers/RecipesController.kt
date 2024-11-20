@@ -43,9 +43,15 @@ class RecipesController(
     @PutMapping("/{recipe-id}")
     fun updateRecipe(
         @RequestBody putRecipeRequest: PutRecipeRequest,
+        @PathVariable(name = "recipe-id") recipeId: String,
         authentication: Authentication,
     ) {
-        recipesRepository.save(putRecipeRequest.toRecipe(authentication.name))
+        val recipe = recipesRepository.findById(recipeId).getOrNull()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND.value(), "Recipe not found")
+        if (recipe.ownerUsername != authentication.name) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN.value(), "Recipe not found", ForbiddenType.NO_PERMISSION)
+        }
+        recipesRepository.save(putRecipeRequest.toRecipe(recipe))
     }
 
     @GetMapping("/{recipe-id}")

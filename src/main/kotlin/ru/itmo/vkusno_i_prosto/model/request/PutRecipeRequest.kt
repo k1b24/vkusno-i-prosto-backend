@@ -11,14 +11,16 @@ data class PutRecipeRequest(
     val videoLink: String?,
     val showUsername: Boolean,
 ) {
-    fun toRecipe(username: String): Recipe = Recipe(
+    fun toRecipe(recipe: Recipe): Recipe = Recipe(
+        id = recipe.id,
         name = name,
         image = image,
         ingredients = ingredients,
         steps = steps,
         tags = tags,
         showUsername = showUsername,
+        ownerUsername= recipe.ownerUsername,
         videoLink = videoLink,
-        ownerUsername= username,
+        favorites = recipe.favorites,
     )
 }

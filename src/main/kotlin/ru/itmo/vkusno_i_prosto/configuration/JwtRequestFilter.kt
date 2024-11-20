@@ -1,6 +1,7 @@
 package ru.itmo.vkusno_i_prosto.configuration
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.jsonwebtoken.MalformedJwtException
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -29,7 +30,18 @@ class JwtRequestFilter(
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7)
-            login = jwtService.extractLogin(jwt)
+            if (jwt == "null" || jwt.isEmpty()) {
+                response.status = HttpServletResponse.SC_UNAUTHORIZED
+                response.outputStream.write(jacksonObjectMapper().writeValueAsBytes(ErrorResponse("Token is missing", ForbiddenType.NO_PERMISSION.name)))
+                return
+            }
+            try {
+                login = jwtService.extractLogin(jwt)
+            } catch (e: MalformedJwtException) {
+                response.status = HttpServletResponse.SC_UNAUTHORIZED
+                response.outputStream.write(jacksonObjectMapper().writeValueAsBytes(ErrorResponse("Token is invalid", ForbiddenType.NO_PERMISSION.name)))
+                return
+            }
         }
 
         if (login != null && SecurityContextHolder.getContext().authentication == null) {

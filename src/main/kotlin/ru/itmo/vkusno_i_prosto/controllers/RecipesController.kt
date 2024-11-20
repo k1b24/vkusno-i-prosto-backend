@@ -144,7 +144,7 @@ fun Recipe.toRecipeResponse(username: String?) = RecipeResponse(
     ingredients = ingredients,
     steps = steps,
     tags = tags,
-    ownerUsername = if (showUsername || username == ownerUsername) ownerUsername else null,
+    ownerUsername = username,
     showUsername = showUsername,
     videoLink = videoLink,
 )

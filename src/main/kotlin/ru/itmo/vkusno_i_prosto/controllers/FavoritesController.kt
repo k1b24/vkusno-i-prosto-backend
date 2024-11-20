@@ -37,7 +37,7 @@ class FavoritesController(
         val trueOffset = offset ?: 0
         val trueLimit = limit ?: Long.MAX_VALUE
         return PageableRecipeResponse(
-            recipes = recipesRepository.findByFavoritesContains(listOf(authentication.name), trueOffset, trueLimit).map { it.toRecipeResponse(authentication.name) },
+            recipes = recipesRepository.findByFavoritesContains(listOf(authentication.name), trueOffset, trueLimit).map { it.toRecipeResponse() },
             offset = trueOffset,
             limit = trueLimit,
             total = recipesRepository.countByFavoritesContains(authentication.name),

@@ -57,7 +57,7 @@ class RecipesController(
         if (recipe.isEmpty) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND.value(), "Recipe not found")
         }
-        return recipe.get().toRecipeResponse(authentication?.name)
+        return recipe.get().toRecipeResponse()
     }
 
     @GetMapping
@@ -80,7 +80,7 @@ class RecipesController(
             recipesRepository.findAll(ingredients, trueExclude, trueName, trueOffset, trueLimit)
         }
         return PageableRecipeResponse(
-            recipes = recipes.map { it.toRecipeResponse(authentication?.name) },
+            recipes = recipes.map { it.toRecipeResponse() },
             offset = trueOffset,
             limit = trueLimit,
             total = total,
@@ -107,7 +107,7 @@ class RecipesController(
             recipesRepository.findAllByUsername(ingredients, trueExclude, authentication.name, trueName, trueOffset, trueLimit)
         }
         return PageableRecipeResponse(
-            recipes = recipes.map { it.toRecipeResponse(authentication.name) },
+            recipes = recipes.map { it.toRecipeResponse() },
             offset = trueOffset,
             limit = trueLimit,
             total = total,
@@ -137,14 +137,14 @@ class RecipesController(
     }
 }
 
-fun Recipe.toRecipeResponse(username: String?) = RecipeResponse(
+fun Recipe.toRecipeResponse() = RecipeResponse(
     id = id!!,
     name = name,
     image = image,
     ingredients = ingredients,
     steps = steps,
     tags = tags,
-    ownerUsername = username,
+    ownerUsername = ownerUsername,
     showUsername = showUsername,
     videoLink = videoLink,
 )

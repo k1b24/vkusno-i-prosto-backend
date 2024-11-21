@@ -23,12 +23,14 @@ import ru.itmo.vkusno_i_prosto.model.response.ErrorResponse
 import ru.itmo.vkusno_i_prosto.model.response.PageableRecipeResponse
 import ru.itmo.vkusno_i_prosto.model.response.RecipeResponse
 import ru.itmo.vkusno_i_prosto.repository.RecipesRepository
+import ru.itmo.vkusno_i_prosto.service.UrlValidator
 import kotlin.jvm.optionals.getOrNull
 
 @RestController
 @RequestMapping("/v1/recipes")
 class RecipesController(
     private val recipesRepository: RecipesRepository,
+    private val urlValidator: UrlValidator,
 ) {
 
     @PostMapping
@@ -37,6 +39,10 @@ class RecipesController(
         @RequestBody postRecipeRequest: PostRecipeRequest,
         authentication: Authentication,
     ) {
+        if (!urlValidator.validate(postRecipeRequest.image)
+            || (postRecipeRequest.videoLink != null && !urlValidator.validate(postRecipeRequest.videoLink))) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST.value(), "Invalid image or video link")
+        }
         recipesRepository.save(postRecipeRequest.toRecipe(authentication.name))
     }
 
@@ -46,6 +52,10 @@ class RecipesController(
         @PathVariable(name = "recipe-id") recipeId: String,
         authentication: Authentication,
     ) {
+        if (!urlValidator.validate(putRecipeRequest.image)
+            || (putRecipeRequest.videoLink != null && !urlValidator.validate(putRecipeRequest.videoLink))) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST.value(), "Invalid image or video link")
+        }
         val recipe = recipesRepository.findById(recipeId).getOrNull()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND.value(), "Recipe not found")
         if (recipe.ownerUsername != authentication.name) {

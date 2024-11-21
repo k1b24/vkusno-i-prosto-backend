@@ -11,6 +11,7 @@ class UrlValidator {
             URL(url)
             return true
         } catch (e: Exception) {
+            if (url.isEmpty()) return true
             return false
         }
     }
